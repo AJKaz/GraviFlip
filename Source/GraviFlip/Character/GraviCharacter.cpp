@@ -16,10 +16,12 @@ AGraviCharacter::AGraviCharacter() {
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 0.f;
 	CameraBoom->bUsePawnControlRotation = true;
-
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	/* Player Settings Setup */
+	MouseSensitivity = 0.5f;
 }
 
 void AGraviCharacter::BeginPlay() {
@@ -30,8 +32,6 @@ void AGraviCharacter::BeginPlay() {
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
-	
-
 }
 
 void AGraviCharacter::Tick(float DeltaTime) {
@@ -45,19 +45,24 @@ void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(InputMoveAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Move);
 		EnhancedInputComponent->BindAction(InputLookAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Look);
+		EnhancedInputComponent->BindAction(InputJumpAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Jump);
 	}
 }
 
 void AGraviCharacter::Move(const FInputActionValue& Value) {
-	const FVector2D MoveAxisValue = Value.Get<FVector2D>();
-	AddMovementInput(GetActorRightVector(), MoveAxisValue.X);
-	AddMovementInput(GetActorForwardVector(), MoveAxisValue.Y);
+	const FVector2D MoveVector = Value.Get<FVector2D>();
+	AddMovementInput(GetActorRightVector(), MoveVector.X);
+	AddMovementInput(GetActorForwardVector(), MoveVector.Y);
 }
 
 void AGraviCharacter::Look(const FInputActionValue& Value) {
 	const FVector2D LookAxisValue = Value.Get<FVector2D>();
 	if (GetController()) {
-		AddControllerYawInput(LookAxisValue.X);
-		AddControllerPitchInput(LookAxisValue.Y);
+		AddControllerYawInput(LookAxisValue.X * MouseSensitivity);
+		AddControllerPitchInput(LookAxisValue.Y * MouseSensitivity);
 	}
+}
+
+void AGraviCharacter::Jump() {
+	Super::Jump();
 }

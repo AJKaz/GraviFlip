@@ -21,6 +21,7 @@ public:
 	AGraviCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void Jump() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,6 +30,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputMappingContext* InputMappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputMoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputLookAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputJumpAction;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
@@ -37,6 +39,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera") USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, Category = "Camera") UCameraComponent* FollowCamera;
 
+	/* Player Settings */
+	UPROPERTY(EditAnywhere, Category = "Settings") float MouseSensitivity;
 	
 	
 	
