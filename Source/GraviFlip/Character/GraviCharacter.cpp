@@ -57,10 +57,8 @@ void AGraviCharacter::Move(const FInputActionValue& Value) {
 
 void AGraviCharacter::Look(const FInputActionValue& Value) {
 	const FVector2D LookAxisValue = Value.Get<FVector2D>();
-	if (GetController()) {
-		AddControllerYawInput(LookAxisValue.X * MouseSensitivity);
-		AddControllerPitchInput(LookAxisValue.Y * MouseSensitivity);
-	}
+	AddControllerYawInput(LookAxisValue.X * MouseSensitivity);
+	AddControllerPitchInput(LookAxisValue.Y * MouseSensitivity);
 }
 
 void AGraviCharacter::Jump() {
