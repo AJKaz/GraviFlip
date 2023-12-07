@@ -7,21 +7,27 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"
+#include "LegacyCameraShake.h"
 
 AGraviCharacter::AGraviCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	/* Camera Component Setup */
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(GetMesh());
-	CameraBoom->TargetArmLength = 0.f;
-	CameraBoom->bUsePawnControlRotation = true;
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
+	PlayerCamera->SetupAttachment(GetMesh());
+	PlayerCamera->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+	PlayerCamera->SetRelativeLocation(FVector(0.f, 20.f, 165.f));
+	PlayerCamera->bUsePawnControlRotation = true;
+	CameraShakeScale = 1.f;
+	CameraLandScale = 3.f;
+	CameraShakeBase = nullptr;
 
 	/* Player Settings Setup */
 	MouseSensitivity = 0.5f;
+	bIsViewBobbingEnabled = true;
+
+	/* Misc */
+	bIsWalking = false;
 }
 
 void AGraviCharacter::BeginPlay() {
@@ -36,6 +42,8 @@ void AGraviCharacter::BeginPlay() {
 
 void AGraviCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+
+	//if (bIsViewBobbingEnabled && bIsWalking) ViewBobbing(DeltaTime);
 }
 
 void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
@@ -44,15 +52,25 @@ void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	/* Setup Input */
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(InputMoveAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Move);
+		EnhancedInputComponent->BindAction(InputMoveAction, ETriggerEvent::Completed, this, &AGraviCharacter::StopMoving);
 		EnhancedInputComponent->BindAction(InputLookAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Look);
 		EnhancedInputComponent->BindAction(InputJumpAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Jump);
 	}
 }
 
 void AGraviCharacter::Move(const FInputActionValue& Value) {
+	if (!bIsWalking) {
+		StartCameraShake();
+	}
+	bIsWalking = true;
 	const FVector2D MoveVector = Value.Get<FVector2D>();
 	AddMovementInput(GetActorRightVector(), MoveVector.X);
 	AddMovementInput(GetActorForwardVector(), MoveVector.Y);
+}
+
+void AGraviCharacter::StopMoving() {
+	bIsWalking = false;
+	StopCameraShake();
 }
 
 void AGraviCharacter::Look(const FInputActionValue& Value) {
@@ -61,6 +79,42 @@ void AGraviCharacter::Look(const FInputActionValue& Value) {
 	AddControllerPitchInput(LookAxisValue.Y * MouseSensitivity);
 }
 
+void AGraviCharacter::StartCameraShake() {
+	if (UWorld* World = GetWorld()) {
+		if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
+			if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
+				CameraShakeBase = Manager->StartCameraShake(CameraShake, CameraShakeScale);
+			}
+		}
+	}
+}
+
+void AGraviCharacter::StopCameraShake() {
+	if (CameraShakeBase) {
+		if (UWorld* World = GetWorld()) {
+			if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
+				if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
+					Manager->StopCameraShake(CameraShakeBase, false);
+				}
+			}
+		}
+	}
+	
+}
+
 void AGraviCharacter::Jump() {
 	Super::Jump();
+}
+
+void AGraviCharacter::Landed(const FHitResult& Hit) {
+	Super::Landed(Hit); 
+	// Camera Land shake - currently disabled cause I don't like it, it does a full
+	// oscillation which looks weird, it should only go down/back to normal, not go up
+	/*if (UWorld* World = GetWorld()) {
+		if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
+			if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
+				Manager->StartCameraShake(CameraLand, CameraLandScale);
+			}
+		}
+	}*/
 }
