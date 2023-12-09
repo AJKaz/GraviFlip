@@ -44,17 +44,15 @@ private:
 	/* Camera */
 	UPROPERTY(VisibleAnywhere, Category = "Camera") UCameraComponent* PlayerCamera;
 	// Camera View Bobbing
-	UPROPERTY(EditAnywhere, Category = "Camera") TSubclassOf<ULegacyCameraShake> CameraShake;
-	UPROPERTY(EditAnywhere, Category = "Camera") TSubclassOf<ULegacyCameraShake> CameraLand;
-	UPROPERTY(EditAnywhere, Category = "Camera") float CameraShakeScale;
-	UPROPERTY(EditAnywhere, Category = "Camera") float CameraLandScale;
-	UPROPERTY() UCameraShakeBase* CameraShakeBase;
+	UPROPERTY(EditAnywhere, Category = "Camera") TSubclassOf<UCameraShakeBase> CameraLandShake;
+	UPROPERTY(EditAnywhere, Category = "Camera") TSubclassOf<UCameraShakeBase> CameraMoveShake;
+	UPROPERTY() UCameraShakeBase* SavedCameraMoveShake;
 	void StartCameraShake();
 	void StopCameraShake();
 
 	/* Player Settings */
-	UPROPERTY(EditAnywhere, Category = "Settings") float MouseSensitivity;
-	UPROPERTY(EditAnywhere, Category = "Settings") bool bIsViewBobbingEnabled;
+	UPROPERTY(EditAnywhere, Category = "Player Settings") float MouseSensitivity;
+	UPROPERTY(EditAnywhere, Category = "Player Settings") bool bIsViewBobbingEnabled;
 
 
 	/* Misc */

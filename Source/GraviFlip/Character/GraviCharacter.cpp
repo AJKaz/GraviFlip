@@ -18,9 +18,7 @@ AGraviCharacter::AGraviCharacter() {
 	PlayerCamera->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
 	PlayerCamera->SetRelativeLocation(FVector(0.f, 20.f, 165.f));
 	PlayerCamera->bUsePawnControlRotation = true;
-	CameraShakeScale = 1.f;
-	CameraLandScale = 3.f;
-	CameraShakeBase = nullptr;
+	SavedCameraMoveShake = nullptr;
 
 	/* Player Settings Setup */
 	MouseSensitivity = 0.5f;
@@ -42,8 +40,6 @@ void AGraviCharacter::BeginPlay() {
 
 void AGraviCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
-	//if (bIsViewBobbingEnabled && bIsWalking) ViewBobbing(DeltaTime);
 }
 
 void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
@@ -59,7 +55,7 @@ void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 }
 
 void AGraviCharacter::Move(const FInputActionValue& Value) {
-	if (!bIsWalking) {
+	if (!bIsWalking && bIsViewBobbingEnabled) {
 		StartCameraShake();
 	}
 	bIsWalking = true;
@@ -83,23 +79,22 @@ void AGraviCharacter::StartCameraShake() {
 	if (UWorld* World = GetWorld()) {
 		if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
 			if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
-				CameraShakeBase = Manager->StartCameraShake(CameraShake, CameraShakeScale);
+				SavedCameraMoveShake = Manager->StartCameraShake(CameraMoveShake);
 			}
 		}
 	}
 }
 
 void AGraviCharacter::StopCameraShake() {
-	if (CameraShakeBase) {
+	if (SavedCameraMoveShake) {
 		if (UWorld* World = GetWorld()) {
 			if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
 				if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
-					Manager->StopCameraShake(CameraShakeBase, false);
+					Manager->StopCameraShake(SavedCameraMoveShake, false);
 				}
 			}
 		}
 	}
-	
 }
 
 void AGraviCharacter::Jump() {
@@ -108,13 +103,11 @@ void AGraviCharacter::Jump() {
 
 void AGraviCharacter::Landed(const FHitResult& Hit) {
 	Super::Landed(Hit); 
-	// Camera Land shake - currently disabled cause I don't like it, it does a full
-	// oscillation which looks weird, it should only go down/back to normal, not go up
-	/*if (UWorld* World = GetWorld()) {
+	if (UWorld* World = GetWorld()) {
 		if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
 			if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
-				Manager->StartCameraShake(CameraLand, CameraLandScale);
+				Manager->StartCameraShake(CameraLandShake);
 			}
 		}
-	}*/
+	}
 }
