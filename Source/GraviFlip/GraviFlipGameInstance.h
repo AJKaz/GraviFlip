@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Engine/GameInstance.h"
-//#include "OnlineSubsystem.h"
-//#include "OnlineSessionSettings.h"
-//#include "Interfaces/OnlineSessionInterface.h"
+#include "Engine/GameInstance.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "GraviFlipGameInstance.generated.h"
 
 /**
@@ -22,7 +22,6 @@ public:
 
 protected:
 	/* Online Subsystem Stuff */
-	/*
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
 	IOnlineSessionPtr SessionInterface;
@@ -35,25 +34,41 @@ protected:
 	virtual void OnNetworkFailure(UWorld* InWorld, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 	virtual void OnTravelFailure(UWorld* InWorld, ETravelFailure::Type FailureType, const FString& ErrorString);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSessionSearchComplete(int32 NumSessions);
+
 	UFUNCTION(BlueprintCallable)
-	void CreateServer();
+	void CreateServer(FName SessionName, int32 MaxPlayers);
+
+	UFUNCTION(BlueprintCallable)
+	void FindSessions();
 
 	UFUNCTION(BlueprintCallable)
 	void JoinServer();
 
 	void JoinSession(FName NameOfSession, const FOnlineSessionSearchResult &DesiredSession);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Session Settings")
-	FName SessionName;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Session Settings")
-	int32 NumPublicConnections;
-
+	UFUNCTION(BlueprintCallable)
+	void JoinSession(int32 Index);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Create Session Settings")
 	bool bShouldAdvertise;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Session Info")
-	FName CurrentSessionName;
-	*/
+private:
+
+	TArray<FOnlineSessionSearchResult> SearchResults;
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	FString GetServerName(int32 Index) const;
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetServerPing(int32 Index) const;
+
+	UFUNCTION(BlueprintCallable)
+	FString GetPlayerCount(int32 Index) const;
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetNumSessions() const;
 
 };
