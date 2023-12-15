@@ -21,6 +21,10 @@ public:
 	UGraviFlipGameInstance();
 
 protected:
+	UFUNCTION(BlueprintCallable)
+	FText ValidatePlayerCountInput(FText Input, FText CurrentValue);
+
+#pragma region "Online Subsystem"
 	/* Online Subsystem Stuff */
 	/*
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
@@ -55,5 +59,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Session Info")
 	FName CurrentSessionName;
 	*/
+#pragma endregion
 
+private:
+	const uint8 MAX_PLAYER_COUNT = 20;
+	const uint8 MIN_PLAYER_COUNT = 2;
 };

@@ -2,13 +2,18 @@
 
 
 #include "GraviFlipGameInstance.h"
-//#include "Kismet/GameplayStatics.h"
-//#include "Engine/GameInstance.h"
-//#include "Engine/World.h"
-//#include "Engine/Engine.h"
+#include "Math/UnrealMathUtility.h"
+/* Steam Sessions
+#include "Kismet/GameplayStatics.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+*/
+
 
 UGraviFlipGameInstance::UGraviFlipGameInstance() {
-	/* Steam Sessions
+	/* 
+	// Steam Sessions
 	SessionName = FName("Boring Session Name");
 	NumPublicConnections = 20;
 	bShouldAdvertise = true;
@@ -16,6 +21,27 @@ UGraviFlipGameInstance::UGraviFlipGameInstance() {
 	*/
 }
 
+FText UGraviFlipGameInstance::ValidatePlayerCountInput(FText Input, FText CurrentValue) {
+	FString InputString = Input.ToString();
+	if (InputString == "") {
+		return FText::FromString("");
+	}
+
+	FRegexPattern Pattern(TEXT("-?\\d+$"));
+
+	FRegexMatcher Matcher(Pattern, InputString);
+
+	if (!Matcher.FindNext() || Input.IsEmpty()) {
+		return CurrentValue;
+	}
+
+	int32 InputInt = FCString::Atoi(*InputString);
+	InputInt = FMath::Clamp(InputInt, MIN_PLAYER_COUNT, MAX_PLAYER_COUNT);
+
+	return FText::FromString(FString::FromInt(InputInt));
+}
+
+#pragma region "Online Subsystem"
 /* Steam Session Subsystem
 void UGraviFlipGameInstance::Init() {
 	Super::Init();
@@ -122,3 +148,4 @@ void UGraviFlipGameInstance::JoinSession(FName NameOfSession, const FOnlineSessi
 	}
 }
 */
+#pragma endregion
