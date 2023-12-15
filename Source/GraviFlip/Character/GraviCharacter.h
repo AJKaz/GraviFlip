@@ -57,8 +57,7 @@ private:
 
 	/* Misc */
 	UPROPERTY(VisibleAnywhere, Category = "Misc") bool bIsWalking;
-	
-	
+	float PreJumpZLocation;
 	
 
 public:	

@@ -26,6 +26,7 @@ AGraviCharacter::AGraviCharacter() {
 
 	/* Misc */
 	bIsWalking = false;
+	PreJumpZLocation = 0.f;
 }
 
 void AGraviCharacter::BeginPlay() {
@@ -98,11 +99,13 @@ void AGraviCharacter::StopCameraShake() {
 }
 
 void AGraviCharacter::Jump() {
+	PreJumpZLocation = GetActorLocation().Z;
 	Super::Jump();
 }
 
 void AGraviCharacter::Landed(const FHitResult& Hit) {
-	Super::Landed(Hit); 
+	Super::Landed(Hit);
+	if (GetActorLocation().Z > PreJumpZLocation - 75.f) return;
 	if (UWorld* World = GetWorld()) {
 		if (APlayerController* PlayerController = World->GetFirstPlayerController()) {
 			if (APlayerCameraManager* Manager = PlayerController->PlayerCameraManager) {
