@@ -64,4 +64,11 @@ protected:
 private:
 	const uint8 MAX_PLAYER_COUNT = 20;
 	const uint8 MIN_PLAYER_COUNT = 2;
+	uint8 NumPublicConnections;
+
+	UFUNCTION(BlueprintCallable)
+	void SetNumPublicConnections(int NumConnections);
+
+public:
+	uint8 GetNumPublicConnections() const;
 };

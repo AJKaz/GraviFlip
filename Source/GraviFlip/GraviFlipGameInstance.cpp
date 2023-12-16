@@ -3,6 +3,7 @@
 
 #include "GraviFlipGameInstance.h"
 #include "Math/UnrealMathUtility.h"
+
 /* Steam Sessions
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
@@ -39,6 +40,14 @@ FText UGraviFlipGameInstance::ValidatePlayerCountInput(FText Input, FText Curren
 	InputInt = FMath::Clamp(InputInt, MIN_PLAYER_COUNT, MAX_PLAYER_COUNT);
 
 	return FText::FromString(FString::FromInt(InputInt));
+}
+
+uint8 UGraviFlipGameInstance::GetNumPublicConnections() const {
+	return NumPublicConnections;
+}
+
+void UGraviFlipGameInstance::SetNumPublicConnections(int NumConnections) {
+	this->NumPublicConnections = NumConnections;
 }
 
 #pragma region "Online Subsystem"
