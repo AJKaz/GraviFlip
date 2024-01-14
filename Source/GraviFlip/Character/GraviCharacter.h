@@ -32,6 +32,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputMoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputLookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputJumpAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input") UInputAction* InputFlipGravityAction;
 	
 	/* Movement */
 	void Move(const FInputActionValue& Value);
@@ -59,6 +60,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Misc") bool bIsWalking;
 	float PreJumpZLocation;
 	
+	/* Gravity Flipping */
+	void FlipGravity();
+	bool bCanFlipGravity;
+	float GravityFlipTimer;
+	UPROPERTY(EditAnywhere, Category = "Gravity Flip") float GravityFlipDelay;
 
 public:	
 	

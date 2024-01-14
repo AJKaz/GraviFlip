@@ -24,6 +24,11 @@ AGraviCharacter::AGraviCharacter() {
 	MouseSensitivity = 0.5f;
 	bIsViewBobbingEnabled = true;
 
+	/* Gravity Flipping */
+	bCanFlipGravity = true;
+	GravityFlipTimer = 0.f;
+	GravityFlipDelay = 1.25f;
+
 	/* Misc */
 	bIsWalking = false;
 	PreJumpZLocation = 0.f;
@@ -41,6 +46,14 @@ void AGraviCharacter::BeginPlay() {
 
 void AGraviCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+	
+	if (!bCanFlipGravity) {
+		GravityFlipTimer += DeltaTime;
+		if (GravityFlipTimer >= GravityFlipDelay) {
+			bCanFlipGravity = true;
+			GravityFlipTimer = 0.f;
+		}
+	}
 }
 
 void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
@@ -52,6 +65,7 @@ void AGraviCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(InputMoveAction, ETriggerEvent::Completed, this, &AGraviCharacter::StopMoving);
 		EnhancedInputComponent->BindAction(InputLookAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Look);
 		EnhancedInputComponent->BindAction(InputJumpAction, ETriggerEvent::Triggered, this, &AGraviCharacter::Jump);
+		EnhancedInputComponent->BindAction(InputFlipGravityAction, ETriggerEvent::Triggered, this, &AGraviCharacter::FlipGravity);
 	}
 }
 
@@ -68,6 +82,15 @@ void AGraviCharacter::Move(const FInputActionValue& Value) {
 void AGraviCharacter::StopMoving() {
 	bIsWalking = false;
 	StopCameraShake();
+}
+
+void AGraviCharacter::FlipGravity() {
+	if (bCanFlipGravity) {
+		// TODO: flip gravity here
+
+
+		bCanFlipGravity = false;
+	}
 }
 
 void AGraviCharacter::Look(const FInputActionValue& Value) {
